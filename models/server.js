@@ -5,8 +5,10 @@ const { dbConnection } = require('../database/config');
 class Server {
     constructor() {
         this.app = express();
+        // Define el puerto
         this.port = process.env.PORT || 3000;
         this.usuariosPath = '/api/usuarios';
+        this.authPath = '/api/auth';
         // Llamada a conectarDB
         this.conectarDB();
         // Middleware
@@ -14,6 +16,11 @@ class Server {
         // Rutas de la aplicación
         this.routes();
     }
+
+    routes() {
+        this.app.use(this.authPath, require('../routes/auth'));
+        this.app.use(this.usuariosPath, require('../routes/usuarios'));
+    }      
     
     async conectarDB() {
         await dbConnection();
@@ -27,12 +34,7 @@ class Server {
         this.app.use(express.json());
         // Directorio público
         this.app.use(express.static('public'));
-    }
-    
-
-    routes() {
-        this.app.use(this.usuariosPath, require('../routes/usuarios'));
-    }       
+    }    
 
     listen() {
         this.app.listen(this.port, () => {
